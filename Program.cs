@@ -84,7 +84,8 @@ namespace Post.NET
                     }
 
                     //write out response
-                    await File.WriteAllTextAsync("response.txt", $"Status Code: {responseMessage.StatusCode.ToString()}").ConfigureAwait(false);
+                    await File.WriteAllTextAsync("response.txt", $"Status Code: {(int)responseMessage.StatusCode} {responseMessage.StatusCode.ToString()}").ConfigureAwait(false);
+                    await File.AppendAllTextAsync("response.txt", Environment.NewLine);
                     await File.AppendAllTextAsync("response.txt", $"Response Body: {await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false)}");
 
                     Console.WriteLine("Done. Bow down to Reyes!");
