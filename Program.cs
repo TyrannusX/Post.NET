@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
@@ -54,6 +56,12 @@ namespace Post.NET
                     {
                         var requestText = await File.ReadAllTextAsync("payload.txt").ConfigureAwait(false);
                         requestContent = new StringContent(requestText, Encoding.UTF8, configs["contentType"]);
+                        var headers = configs.GetSection("additionalHeaders").GetChildren().ToList();
+                        Console.WriteLine($"Number of additional headers: {headers.Count}");
+                        foreach(var header in headers)
+                        {
+                            requestContent.Headers.Add(header.Key, header.Value);
+                        }
                     }
 
                     //make request
