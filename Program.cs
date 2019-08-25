@@ -27,7 +27,7 @@ namespace Post.NET
                 if(!string.IsNullOrEmpty(configs["clientCertificatePath"]))
                 {
                     Console.WriteLine("Client certificate provided");
-                    var clientCertificate = new X509Certificate(configs["clientCertificatePath"]);
+                    var clientCertificate = new X509Certificate2(configs["clientCertificatePath"]);
                     httpClientHandler.ClientCertificates.Add(clientCertificate);
                 }
 
