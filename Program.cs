@@ -54,8 +54,33 @@ namespace Post.NET
                     HttpContent requestContent = null;
                     if(configs["httpVerb"]?.ToUpper() != "GET" && configs["httpVerb"]?.ToUpper() != "DELETE")
                     {
-                        var requestText = await File.ReadAllTextAsync("payload.txt").ConfigureAwait(false);
-                        requestContent = new StringContent(requestText, Encoding.UTF8, configs["contentType"]);
+                        //setup request content based on content type
+                        var contentType = configs["contentType"];
+                        switch(contentType)
+                        {
+                            case "application/x-www-form-urlencoded":
+                                var formData = configs.GetSection("formDataKeyAndValues").GetChildren().ToList().Select(x => new KeyValuePair<string, string>(x.Key, x.Value));
+                                requestContent = new FormUrlEncodedContent(formData);
+                                break;
+                            case "multipart/form-data":
+                                try
+                                {
+                                    var fileBytes = await File.ReadAllBytesAsync(configs["fileToPostPath"]).ConfigureAwait(false);
+                                    requestContent = new ByteArrayContent(fileBytes);
+                                }
+                                catch(Exception ex)
+                                {
+                                    Console.WriteLine($"Error occurred loading file: {ex.Message}");
+                                    return;
+                                }
+                                break;
+                            default:
+                                var requestText = await File.ReadAllTextAsync("payload.txt").ConfigureAwait(false);
+                                requestContent = new StringContent(requestText, Encoding.UTF8, configs["contentType"]);
+                                break;
+                        }
+
+                        //add additonal headers if necessary
                         var headers = configs.GetSection("additionalHeaders").GetChildren().ToList();
                         Console.WriteLine($"Number of additional headers: {headers.Count}");
                         foreach(var header in headers)
